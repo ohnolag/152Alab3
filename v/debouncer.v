@@ -2,7 +2,7 @@ module debouncer #(
     parameter CLK_FREQ = 50_000_000,
     parameter DEBOUNCE_TIME_MS = 20
 )(
-    input  wire clk,
+    input  wire clk_50Hz,
     input  wire btn_in,
     output reg  btn_out,
     output wire btn_pulse
@@ -21,7 +21,7 @@ module debouncer #(
     end
 
     // 2. Debounce
-    always @(posedge clk) begin
+    always @(posedge clk_50Hz) begin
         if (sync_1 == btn_out) begin
             timer <= 0;
         end else begin
@@ -35,7 +35,7 @@ module debouncer #(
     end
 
     // 3. Edge detection
-    always @(posedge clk) begin
+    always @(posedge clk_50Hz) begin
         btn_out_last <= btn_out;
     end
 
