@@ -16,17 +16,12 @@ module fsm (
     parameter NORMAL = 1'b0;
     parameter PAUSE  = 1'b1;
 
-    reg state;
-    reg next_state;
+    reg state = NORMAL;
+    reg next_state = NORMAL;
 
-    // State register: srst returns the controller to 
-    // normal running mode.
-    
-    always @(posedge clk or posedge srst) begin
-        if (srst)
-            state <= NORMAL;
-        else
-            state <= next_state;
+    // State register
+    always @(posedge clk) begin
+        state <= next_state;
     end
 
     always @(*) begin
