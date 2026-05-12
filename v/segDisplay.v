@@ -1,5 +1,5 @@
 module segDisplay (
-    input state,
+    input [2:0] state,
     input clk1Hz,
     input clk2Hz,
     input clk50Hz,
