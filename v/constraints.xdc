@@ -5,9 +5,9 @@
 set_property -dict { PACKAGE_PIN V10   IOSTANDARD LVCMOS33 } [get_ports clk]
 create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports clk] #Should handle time constraint
 
-set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports adj_level] 
+set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports ADJ] 
 
-set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports sel_level]
+set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports SEL]
 
 #connected to segDisplay module
 set_property -dict { PACKAGE_PIN W7    IOSTANDARD LVCMOS33 } [get_ports CA]
@@ -26,6 +26,6 @@ set_property -dict { PACKAGE_PIN U2    IOSTANDARD LVCMOS33 } [get_ports AN0]
 
 #buttons
 #reset button
-set_property -dict { PACKAGE_PIN U18   IOSTANDARD LVCMOS33 } [get_ports reset_pulse]
+set_property -dict { PACKAGE_PIN U18   IOSTANDARD LVCMOS33 } [get_ports RESET]
 # Pause button
-set_property -dict { PACKAGE_PIN T18   IOSTANDARD LVCMOS33 } [get_ports pause_pulse]
+set_property -dict { PACKAGE_PIN T18   IOSTANDARD LVCMOS33 } [get_ports PAUSE]
