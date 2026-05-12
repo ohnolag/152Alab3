@@ -15,7 +15,7 @@ module debouncer #(
     reg sync_0, sync_1;
     reg btn_out_last;
 
-    always @(posedge clk_50Hz) begin
+    always @(posedge clk) begin
         sync_0<=btn_in;
         sync_1<=sync_0;
     end
