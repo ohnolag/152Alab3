@@ -1,6 +1,5 @@
 module fsm (
     input wire clk,
-    input wire srst,
 
     input wire pause_pulse,
     input wire reset_pulse,
