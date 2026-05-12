@@ -7,20 +7,20 @@ module segDisplay (
     input clk2Hz,
     input clk50Hz,
     input blink,
-    output AN0,
-    output AN1,
-    output AN2,
-    output AN3,
-    output CA,
-    output CB,
-    output CC,
-    output CD,
-    output CE,
-    output CF,
-    output CG
+    output reg AN0,
+    output reg AN1,
+    output reg AN2,
+    output reg AN3,
+    output reg CA,
+    output reg CB,
+    output reg CC,
+    output reg CD,
+    output reg CE,
+    output reg CF,
+    output reg CG
 );
 
-localparam [6:0] digits [0:10] = '{
+reg [6:0] digits [0:10] = '{
     7'b1111110, //0
     7'b0110000, //1
     7'b1101101, //2
@@ -34,7 +34,7 @@ localparam [6:0] digits [0:10] = '{
     7'b0000000 //off
 };
 
-localparam [3:0] anodes [0:3] = '{
+reg [3:0] anodes [0:3] = '{
     4'b0001, //digit 0
     4'b0010,
     4'b0100,
@@ -42,7 +42,6 @@ localparam [3:0] anodes [0:3] = '{
 };
 
 reg [3:0] counter [0:3];
-wire [2:0] state = 0;
 
 initial begin
     counter[0] = 0;
@@ -59,7 +58,7 @@ always @(posedge clk50Hz) begin
     current_numeral <= counter[active];
     current_digit <= anodes[active];
 
-    begin if(blink && adj_mode && sel_seconds)
+    if (blink && adj_mode && sel_seconds) begin
         AN0 <= 0;
         AN1 <= 0;
     end else begin
@@ -67,7 +66,7 @@ always @(posedge clk50Hz) begin
         AN1 <= current_digit[1];
     end
 
-    begin if(blink && adj_mode && ~sel_seconds)
+    if (blink && adj_mode && ~sel_seconds) begin
         AN2 <= 0;
         AN3 <= 0;
     end else begin

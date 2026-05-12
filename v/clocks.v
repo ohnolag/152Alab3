@@ -1,9 +1,9 @@
 module clock (
     input clk, //basys master clock 500MHz
-    output clk1Hz = 0,
-    output clk2Hz = 0,
-    output clk50Hz = 0,
-    output blink = 0 //0.5hz
+    output reg clk1Hz = 0,
+    output reg clk2Hz = 0,
+    output reg clk50Hz = 0,
+    output reg blink = 0 //0.5hz
 );
 
 localparam CLK_FREQ = 100_000_000;
