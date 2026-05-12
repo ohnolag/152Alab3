@@ -1,5 +1,8 @@
 module segDisplay (
-    input [2:0] state,
+    input running,
+    input do_reset,
+    input adj_mode,
+    input sel_seconds,
     input clk1Hz,
     input clk2Hz,
     input clk50Hz,
@@ -56,27 +59,19 @@ always @(posedge clk50Hz) begin
     current_numeral <= counter[active];
     current_digit <= anodes[active];
 
-    begin if(blink && (state == 3'b000))
+    begin if(blink && adj_mode && sel_seconds)
         AN0 <= 0;
-    end else begin
-        AN0 <= current_digit[0];
-    end
-
-    begin if(blink && (state == 3'b001))
         AN1 <= 0;
     end else begin
+        AN0 <= current_digit[0];
         AN1 <= current_digit[1];
     end
 
-    begin if(blink && (state == 3'b010))
+    begin if(blink && adj_mode && ~sel_seconds)
         AN2 <= 0;
-    end else begin
-        AN2 <= current_digit[2];
-    end
-
-    begin if(blink && (state == 3'b011))
         AN3 <= 0;
     end else begin
+        AN2 <= current_digit[2];
         AN3 <= current_digit[3];
     end
 
@@ -90,7 +85,7 @@ always @(posedge clk50Hz) begin
 
     active <= active + 1;
 
-    begin if(state == 3'b110) //reset
+    begin if(do_reset) //reset
         counter[0] <= 0;
         counter[1] <= 0;
         counter[2] <= 0;
@@ -99,7 +94,7 @@ always @(posedge clk50Hz) begin
 end
 
 always @(posedge clk1Hz) begin
-    begin if(state == 3'b100) //Normal mode
+    begin if(running) //Normal mode
         begin if(counter[0] == 9)
             begin if(counter[1] == 5)
                 begin if(counter[2] == 9)
@@ -125,19 +120,29 @@ always @(posedge clk1Hz) begin
 end
 
 always @(posedge clk2Hz) begin
-    begin if(state < 3'b100)
-        begin if(state == 3'b001)
-            begin if(counter[state] == 5)
-                counter[state] <= 0;
+    begin if(adj_mode && sel_seconds)
+        begin if(counter[0] == 9)
+            begin if(counter[1] == 5)
+                counter[1] <= 0;
             end else begin
-                counter[state] <= counter[state] + 1;
+                counter[1] <= counter[1] + 1;
             end
+            counter[0] <= 0;
         end else begin
-            begin if(counter[state] == 9)
-                counter[state] <= 0;
+            counter[0] <= counter[0] + 1;
+        end
+    end 
+
+    begin if(adj_mode && ~sel_seconds)
+        begin if(counter[2] == 9)
+            begin if(counter[3] == 9)
+                counter[3] <= 0;
             end else begin
-                counter[state] <= counter[state] + 1;
+                counter[3] <= counter[3] + 1;
             end
+            counter[2] <= 0;
+        end else begin
+            counter[2] <= counter[2] + 1;
         end
     end
 end
