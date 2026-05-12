@@ -84,13 +84,13 @@ always @(posedge clk50Hz) begin
     CG <= digits[current_numeral][6];
 
     active <= active + 1;
+end
 
-    begin if(do_reset) //reset
-        counter[0] <= 0;
-        counter[1] <= 0;
-        counter[2] <= 0;
-        counter[3] <= 0;
-    end
+always @(do_reset) begin
+    counter[0] = 0;
+    counter[1] = 0;
+    counter[2] = 0;
+    counter[3] = 0;
 end
 
 always @(posedge clk1Hz) begin
