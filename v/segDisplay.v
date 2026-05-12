@@ -1,5 +1,9 @@
 module segDisplay (
     input state,
+    input clk1Hz,
+    input clk2Hz,
+    input clk50Hz,
+    input blink,
     output AN0,
     output AN1,
     output AN2,
@@ -68,19 +72,56 @@ always @(posedge clk50Hz) begin
     active <= active + 1;
 end
 
-always @(state) begin
-    case(state)
-        3'b100: //NORMAL
-        3'b101: //PAUSED
-        3'b110: //RESET
-        3'b000: //ADJ D0
-        3'b001: //ADJ D1
-        3'b010: //ADJ D2
-        3'b011: //ADJ D3
-        default:
+always @(posedge clk1Hz) begin
+    begin if(state == 3'b100) //Normal mode
+        begin if(counter[0] == 9)
+            begin if(counter[1] == 5)
+                begin if(counter[2] == 9)
+                    begin if(counter[3] == 9)
+                        counter[3] <= 0;
+                    end else begin
+                        counter[3] <= counter[3] + 1;
+                    end
+                    counter[2] <= 0;
+                end else begin
+                    counter[2] <= counter[2] + 1;
+                end
+                counter[1] <= 0;
+            end else begin
+                counter[1] <= counter[1] + 1;
+            end
+            counter[0] <= 0;
+        end else begin
+            counter[0] <= counter[0] + 1;
+        end
+    end
 
-    endcase
+    begin if(state == 3'b110) //reset
+        counter[0] = 0;
+        counter[1] = 0;
+        counter[2] = 0;
+        counter[3] = 0;
+    end
 
 end
+
+always @(posedge clk2Hz) begin
+    begin if(state < 3'b100)
+        begin if(state == 3'b001)
+            begin if(counter[state] == 5)
+                counter[state] <= 0;
+            end else begin
+                counter[state] <= counter[state] + 1;
+            end
+        end else begin
+            begin if(counter[state] == 9)
+                counter[state] <= 0;
+            end else begin
+                counter[state] <= counter[state] + 1;
+            end
+        end
+    end
+end
+
     
 endmodule
