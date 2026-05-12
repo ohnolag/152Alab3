@@ -6,7 +6,7 @@ module clock (
     output blink = 0 //0.5hz
 );
 
-localparam CLK_FREQ = 500_000_000;
+localparam CLK_FREQ = 100_000_000;
 localparam COUNT1 = CLK_FREQ/2;
 localparam COUNT2 = CLK_FREQ/4;
 localparam COUNT50 = CLK_FREQ/100;

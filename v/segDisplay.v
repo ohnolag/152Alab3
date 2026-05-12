@@ -56,10 +56,29 @@ always @(posedge clk50Hz) begin
     current_numeral <= counter[active];
     current_digit <= anodes[active];
 
-    AN0 <= current_digit[0];
-    AN1 <= current_digit[1];
-    AN2 <= current_digit[2];
-    AN3 <= current_digit[3];
+    begin if(blink && (state == 3'b000))
+        AN0 <= 0;
+    end else begin
+        AN0 <= current_digit[0];
+    end
+
+    begin if(blink && (state == 3'b001))
+        AN1 <= 0;
+    end else begin
+        AN1 <= current_digit[1];
+    end
+
+    begin if(blink && (state == 3'b010))
+        AN2 <= 0;
+    end else begin
+        AN2 <= current_digit[2];
+    end
+
+    begin if(blink && (state == 3'b011))
+        AN3 <= 0;
+    end else begin
+        AN3 <= current_digit[3];
+    end
 
     CA <= digits[current_numeral][0];
     CB <= digits[current_numeral][1];
@@ -70,6 +89,13 @@ always @(posedge clk50Hz) begin
     CG <= digits[current_numeral][6];
 
     active <= active + 1;
+
+    begin if(state == 3'b110) //reset
+        counter[0] <= 0;
+        counter[1] <= 0;
+        counter[2] <= 0;
+        counter[3] <= 0;
+    end
 end
 
 always @(posedge clk1Hz) begin
@@ -94,13 +120,6 @@ always @(posedge clk1Hz) begin
         end else begin
             counter[0] <= counter[0] + 1;
         end
-    end
-
-    begin if(state == 3'b110) //reset
-        counter[0] = 0;
-        counter[1] = 0;
-        counter[2] = 0;
-        counter[3] = 0;
     end
 
 end
