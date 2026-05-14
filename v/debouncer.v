@@ -1,6 +1,6 @@
 module debouncer #(
-    parameter CLK_FREQ = 50_000_000,
-    parameter DEBOUNCE_TIME_MS = 20
+    parameter CLK_FREQ = 50,
+    parameter DEBOUNCE_TIME_MS = 80
 )(
     input  wire clk,
     input  wire btn_in,

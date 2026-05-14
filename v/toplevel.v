@@ -17,20 +17,20 @@ module top(
     output CG
 );
 
-reg clk1Hz;
-reg clk2Hz;
-reg clk50Hz;
-reg blink;
+wire clk1Hz;
+wire clk2Hz;
+wire clk50Hz;
+wire blink;
 
-reg adj_pulse;
-reg sel_pulse;
-reg reset_pulse;
-reg pause_pulse;
+wire adj_pulse;
+wire sel_pulse;
+wire reset_pulse;
+wire pause_pulse;
 
-reg running;
-reg do_reset;
-reg adj_mode;
-reg sel_seconds;
+wire running;
+wire do_reset;
+wire adj_mode;
+wire sel_seconds;
 
 clock u_clock(
     .clk(clk),
@@ -77,10 +77,10 @@ fsm u_fsm(
 );
 
 segDisplay u_segDisplay(
-    .running(running),
-    .do_reset(do_reset),
-    .adj_mode(adj_mode),
-    .sel_seconds(sel_seconds),
+    .running(1'b1),
+    .do_reset(1'b0),
+    .adj_mode(1'b0),
+    .sel_seconds(1'b0),
     .clk1Hz(clk1Hz),
     .clk2Hz(clk2Hz),
     .clk50Hz(clk50Hz),
