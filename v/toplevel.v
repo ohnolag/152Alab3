@@ -22,8 +22,8 @@ wire clk2Hz;
 wire clk50Hz;
 wire blink;
 
-wire adj_pulse;
-wire sel_pulse;
+wire adj_level;
+wire sel_level;
 wire reset_pulse;
 wire pause_pulse;
 
@@ -43,13 +43,13 @@ clock u_clock(
 debouncer u_ADJ(
     .clk(clk50Hz),
     .btn_in(ADJ),
-    .btn_pulse(adj_pulse)
+    .btn_out(adj_level)
 );
 
 debouncer u_SEL(
     .clk(clk50Hz),
     .btn_in(SEL),
-    .btn_pulse(sel_pulse)
+    .btn_out(sel_level)
 );
 
 debouncer u_RESET(
@@ -68,8 +68,8 @@ fsm u_fsm(
     .clk(clk50Hz),
     .pause_pulse(pause_pulse),
     .reset_pulse(reset_pulse),
-    .adj_level(adj_pulse),
-    .sel_level(sel_pulse),
+    .adj_level(adj_level),
+    .sel_level(sel_level),
     .running(running),
     .do_reset(do_reset),
     .adj_mode(adj_mode),
@@ -77,10 +77,10 @@ fsm u_fsm(
 );
 
 segDisplay u_segDisplay(
-    .running(1'b1),
-    .do_reset(1'b0),
-    .adj_mode(1'b0),
-    .sel_seconds(1'b0),
+    .running(running),
+    .do_reset(do_reset),
+    .adj_mode(adj_mode),
+    .sel_seconds(sel_seconds),
     .clk1Hz(clk1Hz),
     .clk2Hz(clk2Hz),
     .clk50Hz(clk50Hz),

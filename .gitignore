@@ -1,0 +1,13 @@
+.DS_Store
+
+# Generated FPGA build outputs
+build/
+
+# Large generated/openxc7 chip databases
+chipdb/
+
+# Common simulator scratch outputs
+*.vcd
+*.fst
+*.lxt
+*.out
