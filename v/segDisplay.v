@@ -20,139 +20,145 @@ module segDisplay (
     output reg CG
 );
 
-reg [6:0] digits [0:10];
+reg [3:0] sec_ones = 0;
+reg [3:0] sec_tens = 0;
+reg [3:0] min_ones = 0;
+reg [3:0] min_tens = 0;
 
-reg [3:0] anodes [0:3];
+reg [1:0] active = 0;
+reg clk1Hz_last = 0;
+reg clk2Hz_last = 0;
 
-reg [3:0] counter [0:3];
+wire tick_1hz = clk1Hz & ~clk1Hz_last;
+wire tick_2hz = clk2Hz & ~clk2Hz_last;
 
-initial begin
-    counter[0] = 0;
-    counter[1] = 0;
-    counter[2] = 0;
-    counter[3] = 0;
-    
-    anodes[0] = 4'b1110;//digit 0
-    anodes[1] = 4'b1101;
-    anodes[2] = 4'b1011;
-    anodes[3] = 4'b0111;//digit 3
-    
-    digits[0] = 7'b1000000; //0
-    digits[1] = 7'b1111001; //1 
-    digits[2] = 7'b0100100;//2
-    digits[3] = 7'b0110000; //3
-    digits[4] = 7'b0011001; //4
-    digits[5] = 7'b0010010; //5
-    digits[6] = 7'b0100000; //6
-    digits[7] = 7'b1111000; //7
-    digits[8] = 7'b0000000; //8
-    digits[9] = 7'b0010000; //9
-    digits[10] = 7'b1111111; //off
-end
+function [6:0] seven_seg;
+    input [3:0] numeral;
+    begin
+        case (numeral)
+            4'd0: seven_seg = 7'b1000000;
+            4'd1: seven_seg = 7'b1111001;
+            4'd2: seven_seg = 7'b0100100;
+            4'd3: seven_seg = 7'b0110000;
+            4'd4: seven_seg = 7'b0011001;
+            4'd5: seven_seg = 7'b0010010;
+            4'd6: seven_seg = 7'b0100000;
+            4'd7: seven_seg = 7'b1111000;
+            4'd8: seven_seg = 7'b0000000;
+            4'd9: seven_seg = 7'b0010000;
+            default: seven_seg = 7'b1111111;
+        endcase
+    end
+endfunction
 
-//render counter on display
-reg [1:0] active = 0; //which digit on the display are we rendering
+task increment_seconds;
+    begin
+        if (sec_ones == 9) begin
+            sec_ones <= 0;
+            if (sec_tens == 5) begin
+                sec_tens <= 0;
+                if (min_ones == 9) begin
+                    min_ones <= 0;
+                    if (min_tens == 9)
+                        min_tens <= 0;
+                    else
+                        min_tens <= min_tens + 1;
+                end else begin
+                    min_ones <= min_ones + 1;
+                end
+            end else begin
+                sec_tens <= sec_tens + 1;
+            end
+        end else begin
+            sec_ones <= sec_ones + 1;
+        end
+    end
+endtask
+
+task increment_minutes;
+    begin
+        if (min_ones == 9) begin
+            min_ones <= 0;
+            if (min_tens == 9)
+                min_tens <= 0;
+            else
+                min_tens <= min_tens + 1;
+        end else begin
+            min_ones <= min_ones + 1;
+        end
+    end
+endtask
+
+task adjust_seconds;
+    begin
+        if (sec_ones == 9) begin
+            sec_ones <= 0;
+            if (sec_tens == 5)
+                sec_tens <= 0;
+            else
+                sec_tens <= sec_tens + 1;
+        end else begin
+            sec_ones <= sec_ones + 1;
+        end
+    end
+endtask
+
 reg [3:0] current_numeral;
-reg [3:0] current_digit;
+reg [3:0] anodes;
+reg display_off;
+reg [6:0] segments;
+
 always @(posedge clk50Hz) begin
-    //current_numeral <= counter[active];
-    current_numeral <= counter[3];
-    current_digit <= anodes[active];
+    clk1Hz_last <= clk1Hz;
+    clk2Hz_last <= clk2Hz;
 
-//    if (blink && adj_mode && sel_seconds) begin
-//        AN0 <= 0;
-//        AN1 <= 0;
-//    end else begin
-//        AN0 <= current_digit[0];
-//        AN1 <= current_digit[1];
-//    end
+    if (do_reset) begin
+        sec_ones <= 0;
+        sec_tens <= 0;
+        min_ones <= 0;
+        min_tens <= 0;
+    end else if (adj_mode && tick_2hz) begin
+        if (sel_seconds)
+            adjust_seconds;
+        else
+            increment_minutes;
+    end else if (running && tick_1hz) begin
+        increment_seconds;
+    end
 
-//    if (blink && adj_mode && ~sel_seconds) begin
-//        AN2 <= 0;
-//        AN3 <= 0;
-//    end else begin
-//        AN2 <= current_digit[2];
-//        AN3 <= current_digit[3];
-//    end
+    case (active)
+        2'd0: begin
+            current_numeral = sec_ones;
+            anodes = 4'b1110;
+            display_off = adj_mode && sel_seconds && blink;
+        end
+        2'd1: begin
+            current_numeral = sec_tens;
+            anodes = 4'b1101;
+            display_off = adj_mode && sel_seconds && blink;
+        end
+        2'd2: begin
+            current_numeral = min_ones;
+            anodes = 4'b1011;
+            display_off = adj_mode && !sel_seconds && blink;
+        end
+        default: begin
+            current_numeral = min_tens;
+            anodes = 4'b0111;
+            display_off = adj_mode && !sel_seconds && blink;
+        end
+    endcase
 
-    AN0 <= 0;
-    AN1 <= 1;
-    AN2 <= 1;
-    AN3 <= 1;
+    if (display_off) begin
+        {AN3, AN2, AN1, AN0} <= 4'b1111;
+        segments = 7'b1111111;
+    end else begin
+        {AN3, AN2, AN1, AN0} <= anodes;
+        segments = seven_seg(current_numeral);
+    end
 
-    CA <= digits[current_numeral][0];
-    CB <= digits[current_numeral][1];
-    CC <= digits[current_numeral][2];
-    CD <= digits[current_numeral][3];
-    CE <= digits[current_numeral][4];
-    CF <= digits[current_numeral][5];
-    CG <= digits[current_numeral][6];
-
+    {CG, CF, CE, CD, CC, CB, CA} <= segments;
     active <= active + 1;
 end
 
-always @(posedge clk2Hz) begin
-
-//    begin if(do_reset)
-//        counter[0] = 0;
-//        counter[1] = 0;
-//        counter[2] = 0;
-//        counter[3] = 0;
-//    end
-
-//    begin if(adj_mode && sel_seconds)
-//        begin if(counter[0] == 9)
-//            begin if(counter[1] == 5)
-//                counter[1] <= 0;
-//            end else begin
-//                counter[1] <= counter[1] + 1;
-//            end
-//            counter[0] <= 0;
-//        end else begin
-//            counter[0] <= counter[0] + 1;
-//        end
-//    end 
-
-//    begin if(adj_mode && ~sel_seconds)
-//        begin if(counter[2] == 9)
-//            begin if(counter[3] == 9)
-//                counter[3] <= 0;
-//            end else begin
-//                counter[3] <= counter[3] + 1;
-//            end
-//            counter[2] <= 0;
-//        end else begin
-//            counter[2] <= counter[2] + 1;
-//        end
-//    end
-
-    //Normal mode
-    begin if(clk1Hz)
-        begin if(running) //Normal mode
-            begin if(counter[0] == 9)
-                begin if(counter[1] == 5)
-                    begin if(counter[2] == 9)
-                        begin if(counter[3] == 9)
-                            counter[3] <= 0;
-                        end else begin
-                            counter[3] <= counter[3] + 1;
-                        end
-                        counter[2] <= 0;
-                    end else begin
-                        counter[2] <= counter[2] + 1;
-                    end
-                    counter[1] <= 0;
-                end else begin
-                    counter[1] <= counter[1] + 1;
-                end
-                counter[0] <= 0;
-            end else begin
-                counter[0] <= counter[0] + 1;
-            end
-        end
-    end
-
-end
-
-    
 endmodule

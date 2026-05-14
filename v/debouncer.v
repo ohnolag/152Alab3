@@ -8,12 +8,15 @@ module debouncer #(
     output wire btn_pulse
 );
 
-    localparam integer COUNT_MAX = (CLK_FREQ / 1000) * DEBOUNCE_TIME_MS;
-    localparam integer COUNT_W   = $clog2(COUNT_MAX);
+    localparam integer COUNT_RAW = (CLK_FREQ * DEBOUNCE_TIME_MS) / 1000;
+    localparam integer COUNT_MAX = (COUNT_RAW < 1) ? 1 : COUNT_RAW;
+    localparam integer COUNT_W   = $clog2(COUNT_MAX + 1);
 
-    reg [COUNT_W-1:0] timer;
-    reg sync_0, sync_1;
-    reg btn_out_last;
+    reg [COUNT_W-1:0] timer = 0;
+    reg sync_0 = 0;
+    reg sync_1 = 0;
+    reg btn_out_last = 0;
+    initial btn_out = 0;
 
     always @(posedge clk) begin
         sync_0<=btn_in;

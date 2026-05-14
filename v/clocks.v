@@ -1,16 +1,16 @@
 module clock (
-    input clk, //basys master clock 500MHz
+    input clk, // Basys 3 master clock, 100 MHz
     output reg clk1Hz = 0,
     output reg clk2Hz = 0,
     output reg clk50Hz = 0,
-    output reg blink = 0 //0.5hz
+    output reg blink = 0 // 1 Hz blink cycle
 );
 
 localparam CLK_FREQ = 100_000_000;
 localparam COUNT1 = CLK_FREQ/2;
 localparam COUNT2 = CLK_FREQ/4;
 localparam COUNT50 = CLK_FREQ/100;
-localparam COUNTSLOW = CLK_FREQ;
+localparam COUNTSLOW = CLK_FREQ/2;
 
 reg [31:0] count1 = 0;
 reg [31:0] count2 = 0;
