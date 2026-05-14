@@ -9,7 +9,7 @@ module clock (
 localparam CLK_FREQ = 100_000_000;
 localparam COUNT1 = CLK_FREQ/2;
 localparam COUNT2 = CLK_FREQ/4;
-localparam COUNT50 = CLK_FREQ/100;
+localparam COUNT50 = CLK_FREQ/800;
 localparam COUNTSLOW = CLK_FREQ/2;
 
 reg [31:0] count1 = 0;
