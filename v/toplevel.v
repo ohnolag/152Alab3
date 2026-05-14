@@ -22,10 +22,10 @@ reg clk2Hz;
 reg clk50Hz;
 reg blink;
 
-reg adj_pulse;
-reg sel_pulse;
-reg reset_pulse;
-reg pause_pulse;
+wire adj_pulse;
+wire sel_pulse;
+wire reset_pulse;
+wire pause_pulse;
 
 reg running;
 reg do_reset;
@@ -43,13 +43,15 @@ clock u_clock(
 debouncer u_ADJ(
     .clk(clk50Hz),
     .btn_in(ADJ),
-    .btn_pulse(adj_pulse)
+    .btn_out(adj_pulse),
+    .btn_pulse()
 );
 
 debouncer u_SEL(
     .clk(clk50Hz),
     .btn_in(SEL),
-    .btn_pulse(sel_pulse)
+    .btn_out(sel_pulse),
+    .btn_pulse()
 );
 
 debouncer u_RESET(
